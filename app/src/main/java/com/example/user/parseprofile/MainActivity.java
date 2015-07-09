@@ -75,20 +75,19 @@ public class MainActivity extends ActionBarActivity {
         });
 
         // averageStars
-        /*
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("movie", "The Matrix");
-        ParseCloud.callFunctionInBackground("averageStars", params, new FunctionCallback<Float>() {
-            public void done(Float ratings, ParseException e) {
+        ParseCloud.callFunctionInBackground("averageStars", params, new FunctionCallback<String>() {
+            public void done(String ratings, ParseException e) {
                 if (e == null) {
                     // ratings is 4.5
-                    mTextCloud.setText("rating is "+ratings);
+                    mTextCloud.setText(ratings);
                 }else{
                     mTextCloud.setText(e.getMessage());
                 }
             }
         });
-        */
+
 
         // Load User Profile object
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UserProfile");
