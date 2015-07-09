@@ -41,63 +41,68 @@ public class MainActivity extends ActionBarActivity {
 
     final int REQ_CODE_SELECT_IMAGE=100;
     final String TAG="naing";
-    private ParseObject userProfile;
-    private ParseFile imageFile;
+    private ParseObject mUserProfile;
+    private ParseFile mImageFile;
 
-    TextView text_cloud;
-    ParseImageView parsed_image;
-    EditText edit_name;
+    TextView mTextCloud;
+    ParseImageView mParsedImage;
+    EditText mEditName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        text_cloud = (TextView)findViewById(R.id.textCloud);
-        parsed_image = (ParseImageView)findViewById(R.id.parsedImage);
-        edit_name = (EditText)findViewById(R.id.editName);
+        mTextCloud = (TextView)findViewById(R.id.textCloud);
+        mParsedImage = (ParseImageView)findViewById(R.id.parsedImage);
+        mEditName = (EditText)findViewById(R.id.editName);
 
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
 
-        Parse.initialize(this, "53EzGw5jV91ZTkHmSlCkXi0gb862SicN5kBNvKsg", "E3gLYj2pu6gTDa95avzeEsXsajEyx73gprF6RMga");
+        Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
 
-        // Cloud Code
+        // Cloud Code testing
+
+        // hello
+        ParseCloud.callFunctionInBackground("hello", new HashMap<String, Object>(), new FunctionCallback<String>() {
+            public void done(String result, ParseException e) {
+                if (e == null) {
+                    Log.d(TAG, "Retrieved : " + result);
+                    mTextCloud.setText(result);
+                }
+            }
+        });
+
+        // averageStars
+        /*
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("movie", "The Matrix");
         ParseCloud.callFunctionInBackground("averageStars", params, new FunctionCallback<Float>() {
             public void done(Float ratings, ParseException e) {
                 if (e == null) {
                     // ratings is 4.5
-                    text_cloud.setText("rating is "+ratings);
+                    mTextCloud.setText("rating is "+ratings);
                 }else{
-                    text_cloud.setText(e.getMessage());
-                }
-            }
-        });
-        /*
-        ParseCloud.callFunctionInBackground("hello", new HashMap<String, Object>(), new FunctionCallback<String>() {
-            public void done(String result, ParseException e) {
-                if (e == null) {
-                    // result is "Hello world!"
-                    text_cloud.setText(result);
+                    mTextCloud.setText(e.getMessage());
                 }
             }
         });
         */
+
         // Load User Profile object
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UserProfile");
         query.getInBackground("xcyfI3wRJG", new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
-                    userProfile = object;
-                    Log.d(TAG, "Retrieved " + userProfile.getString("userName"));
-                    edit_name.setText(userProfile.getString("userName"));
+                    mUserProfile = object;
+                    Log.d(TAG, "Retrieved " + mUserProfile.getString("userName"));
+                    mEditName.setText(mUserProfile.getString("userName"));
 
-                    ParseFile parsedFile = userProfile.getParseFile("photo");
+                    ParseFile parsedFile = mUserProfile.getParseFile("photo");
                     if(parsedFile!=null){
-                        parsed_image.setParseFile(parsedFile);
-                        parsed_image.loadInBackground(new GetDataCallback() {
+                        mParsedImage.setParseFile(parsedFile);
+                        mParsedImage.loadInBackground(new GetDataCallback() {
                             @Override
                             public void done(byte[] bytes, ParseException e) {
 
@@ -112,7 +117,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        parsed_image.setOnClickListener(new View.OnClickListener() {
+        mParsedImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_PICK);
@@ -140,20 +145,20 @@ public class MainActivity extends ActionBarActivity {
                     byte[] scaledData = bos.toByteArray();
 
                     // Save the scaled image to Parse
-                    imageFile = new ParseFile("photo.jpg", scaledData);
-                    imageFile.saveInBackground(new SaveCallback() {
+                    mImageFile = new ParseFile("photo.jpg", scaledData);
+                    mImageFile.saveInBackground(new SaveCallback() {
                             public void done(ParseException e) {
                             if (e != null) {
                                 Log.d(TAG, "put image error! " + e.getMessage());
                             } else {
                                 // put image file
-                                userProfile.put("photo", imageFile);
-                                userProfile.saveInBackground();
+                                mUserProfile.put("photo", mImageFile);
+                                mUserProfile.saveInBackground();
                                 // reload image file from parse
-                                ParseFile photoFile = userProfile.getParseFile("photo");
+                                ParseFile photoFile = mUserProfile.getParseFile("photo");
                                 if(photoFile != null){
-                                    parsed_image.setParseFile(userProfile.getParseFile("photo"));
-                                    parsed_image.loadInBackground(new GetDataCallback() {
+                                    mParsedImage.setParseFile(mUserProfile.getParseFile("photo"));
+                                    mParsedImage.loadInBackground(new GetDataCallback() {
                                         @Override
                                         public void done(byte[] bytes, ParseException e) {
 
